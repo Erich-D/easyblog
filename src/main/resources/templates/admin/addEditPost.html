@@ -4,7 +4,7 @@
     <!--
     <object th:include="fragments :: header" th:remove="tag"></object>
     -->
-    <title>Add/Edit Post | Carey Development</title>
+    <title>Admin</title>
     <script src="https://cdn.tiny.cloud/1/vxw156dg2lhqguoxt6olgkf49eli7iuhkz2kfyovbcb6ikog/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 </head>
 
@@ -17,15 +17,15 @@
     <form id="addEditForm" th:action="@{/admin/addEditPost}" th:object="${blogPost}" method="POST">
         <div class="row">
             <div class="col-md-9">
-                <label>Title</label>
+                <label>Topic</label>
                 <div>
-                    <input type="text" class="form-control" style="width:100%" maxlength="128" th:field="*{topic}" placeholder="Enter title here"/>
+                    <input type="text" class="form-control" style="width:100%" maxlength="128" th:field="*{topic}" placeholder="Enter topic here"/>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-9"> 
-                <textarea th:field="*{body}" style="width:100%; height:600px"></textarea>
+                <textarea th:field="*{body}" style="width:100%; height:800px"></textarea>
                 <script>
                     tinymce.init({
                         selector: '#body',
@@ -101,6 +101,9 @@
                     });
               </script>
             </div>
+        </div>
+        <div class="row">
+            
         </div>
         <div class="row">
             <div class="col-md-9">

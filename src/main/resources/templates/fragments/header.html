@@ -14,12 +14,11 @@
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    <a class="nav-link" href="#">Topic 1</a>
-                    <a class="nav-link" href="#">Topic 2</a>
+                    <a class="nav-link" th:href="@{/(topic=${topic})}" th:each="topic : ${topics}" th:text="${topic}">Topic 1</a>
                     <a class="nav-link disabled">Disabled</a>
                 </div>
             </div>
-            <a class="nav-link float-end" href="#">Login</a>
+            <a class="nav-link float-end" th:href="@{/admin/addEditPost}">Login</a>
         </div>
     </nav>
 </th:block>

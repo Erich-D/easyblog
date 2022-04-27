@@ -5,17 +5,15 @@
  */
 package com.erich.blog.controllers;
 
+import com.erich.blog.models.Post;
 import com.erich.blog.models.PostRepo;
-import java.io.BufferedReader;
-import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
@@ -29,41 +27,21 @@ public class MainController {
    PostRepo pr;
     
    @GetMapping("/")
-   public String testPage(Model model) {
-       model.addAttribute("posts", pr.findAll());
+   public String testPage(Model model, String topic) {
+       System.out.println(topic);
+       List<Post> posts;
+       if(topic == null){
+           posts = pr.findByRegulerTags();
+       }else{
+           posts = pr.findByTopic(topic);
+       }
+       List<Post> asides = pr.findByAsideTag();
+       List<String> topics = pr.findAll().stream().map(t -> t.getTopic()).limit(5).collect(Collectors.toList());
+       model.addAttribute("topics", topics);
+       model.addAttribute("asides", asides);
+       model.addAttribute("posts", posts);
        return "index";
    }
    
-   @PostMapping("/api/img")
-   @ResponseBody
-   public String testPost(HttpServletRequest request) throws IOException{
-        System.out.println(request.getContentLength());
-        StringBuilder builder = new StringBuilder();
-        try (BufferedReader in = request.getReader()) {
-            char[] buf = new char[4096];
-            for (int len; (len = in.read(buf)) > 0; )
-                builder.append(buf, 0, len);
-        }
-        String output = builder.toString();
-        System.out.println(output);   
-        return "redirect:/"; 
-   }
    
-   @PostMapping("/addEditPost")
-	public String addEditPostSubmit(Model model) {
-            /*
-	    System.out.println("Title is " + blogPost.getTitle());
-	    System.out.println("Body is " + blogPost.getBody());
-	    
-		return "admin/addEditPost";
-	}
-
-	
-	private void setDefaultBlogPost(Model model) {
-		BlogPost blogPost = new BlogPost();		
-		model.addAttribute("blogPost", blogPost);
-	}
-        */
-            
-        return "index";}
 }
