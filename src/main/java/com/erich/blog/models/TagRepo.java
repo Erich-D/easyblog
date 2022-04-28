@@ -12,5 +12,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author etdeh
  */
 public interface TagRepo extends JpaRepository<Tag, Integer> {
-    
+    Tag findByName(String name);
 }

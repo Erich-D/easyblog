@@ -1,117 +1,139 @@
 <!DOCTYPE html>
-<html lang="en-US" xmlns:th="http://www.thymeleaf.org">
+<html lang="en-US" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}">
 <head>
-    <!--
-    <object th:include="fragments :: header" th:remove="tag"></object>
-    -->
     <title>Admin</title>
     <script src="https://cdn.tiny.cloud/1/vxw156dg2lhqguoxt6olgkf49eli7iuhkz2kfyovbcb6ikog/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 </head>
 
 <body>
-    
-<div class="container">
-    <!--
-    <object th:include="fragments/topbar :: topbar" th:remove="tag"></object>
-    -->
-    <form id="addEditForm" th:action="@{/admin/addEditPost}" th:object="${blogPost}" method="POST">
-        <div class="row">
-            <div class="col-md-9">
-                <label>Topic</label>
-                <div>
-                    <input type="text" class="form-control" style="width:100%" maxlength="128" th:field="*{topic}" placeholder="Enter topic here"/>
+    <div layout:fragment="content" th:remove="tag">
+        <div class="container">
+            <form id="addEditForm" th:action="@{/admin/addEditPost}" th:object="${blogPost}" method="POST">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label>Topic</label>
+                        <div>
+                            <input type="text" class="form-control" style="width:100%" maxlength="128" th:field="*{topic}" placeholder="Enter topic here"/>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <div class="row mb-3">
+                    <div class="col"> 
+                        <textarea th:field="*{body}" style="width:100%; height:800px"></textarea>
+                        <script>
+                            tinymce.init({
+                                selector: '#body',
+                                plugins: 'link lists preview media image code formatpainter insertdatetime table help',
+                                toolbar: 'alignleft aligncenter alignright alignjustify | formatselect | bullist numlist | outdent indent | link image code',
+                                toolbar_mode: 'floating',
+                                tinycomments_author: 'Erich D',
+                                images_upload_handler: function (blobInfo, success, failure) {
+                                    var xhr, formData;
+
+                                    xhr = new XMLHttpRequest();
+                                    xhr.withCredentials = false;
+                                    xhr.open('POST', 'http://localhost:8080/upload/image');
+
+                                    xhr.onload = function () {
+                                        var json;
+
+                                        if (xhr.status != 200) {
+                                            failure('HTTP Error: ' + xhr.status);
+                                            return;
+                                        }
+
+                                        json = xhr.responseText;
+                                        success(json);
+                                    };
+
+
+                                    formData = new FormData();
+                                    formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                                    xhr.send(formData);
+                                },
+                                /* enable title field in the Image dialog*/
+                                image_title: true,
+
+                                /* enable automatic uploads of images represented by blob or data URIs*/
+                                automatic_uploads: true,
+
+                                /*Here we add custom filepicker only to Image dialog*/
+                                file_picker_types: 'image',
+                                /* and here's our custom image picker*/
+                                file_picker_callback: function (cb, value, meta) {
+                                    var input = document.createElement('input');
+                                    input.setAttribute('type', 'file');
+                                    input.setAttribute('accept', 'image/*');
+
+                                    input.onchange = function () {
+                                        var file = this.files[0];                    
+                                        var reader = new FileReader();
+
+                                        reader.onload = function () {
+                                            /*
+                                            Note: Now we need to register the blob in TinyMCEs image blob
+                                            registry. In the next release this part hopefully won't be
+                                            necessary, as we are looking to handle it internally.
+                                            */
+                                            var id = 'blobid' + (new Date()).getTime();
+                                            var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
+                                            var base64 = reader.result.split(',')[1];
+
+                                            var blobInfo = blobCache.create(id, file, base64);                                    
+                                            blobCache.add(blobInfo);
+
+                                            /* call the callback and populate the Title field with the file name */
+                                            cb(blobInfo.blobUri(), { title: file.name });
+                                        };
+
+                                        reader.readAsDataURL(file);
+                                    };
+
+                                    input.click();
+                                }   
+                            });
+                      </script>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label>Tags</label>
+                        <div>
+                            <input type="text" class="form-control" maxlength="128" name="tagString" placeholder="Enter tags here ex. #tag1 #tag2"/>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label>Start Date</label>
+                        <div>
+                            <input type="datetime-local" class="form-control" maxlength="128" name="start" placeholder="Enter start date"/>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label>End Date</label>
+                        <div>
+                            <input type="datetime-local" class="form-control" maxlength="128" name="end" placeholder="Enter end date"/>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group mb-3">
+                            <div class="input-group-text">
+                              <input class="form-check-input mt-0" type="checkbox" value="aside" aria-label="Checkbox for following text input" name="aside">
+                            </div>
+                            <input type="text" class="form-control" aria-label="Text input with checkbox" placeholder="SideBar" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <input type="submit" value="Save"/>
+                    </div>
+                </div>    
+            </form> 
         </div>
-        <div class="row">
-            <div class="col-md-9"> 
-                <textarea th:field="*{body}" style="width:100%; height:800px"></textarea>
-                <script>
-                    tinymce.init({
-                        selector: '#body',
-                        plugins: 'link lists preview media image code formatpainter insertdatetime table help',
-                        toolbar: 'alignleft aligncenter alignright alignjustify | formatselect | bullist numlist | outdent indent | link image code',
-                        toolbar_mode: 'floating',
-                        tinycomments_author: 'Erich D',
-                        images_upload_handler: function (blobInfo, success, failure) {
-                            var xhr, formData;
-
-                            xhr = new XMLHttpRequest();
-                            xhr.withCredentials = false;
-                            xhr.open('POST', 'http://localhost:8080/upload/image');
-
-                            xhr.onload = function () {
-                                var json;
-
-                                if (xhr.status != 200) {
-                                    failure('HTTP Error: ' + xhr.status);
-                                    return;
-                                }
-
-                                json = xhr.responseText;
-                                success(json);
-                            };
-
-
-                            formData = new FormData();
-                            formData.append('file', blobInfo.blob(), blobInfo.filename());
-
-                            xhr.send(formData);
-                        },
-                        /* enable title field in the Image dialog*/
-                        image_title: true,
-
-                        /* enable automatic uploads of images represented by blob or data URIs*/
-                        automatic_uploads: true,
-
-                        /*Here we add custom filepicker only to Image dialog*/
-                        file_picker_types: 'image',
-                        /* and here's our custom image picker*/
-                        file_picker_callback: function (cb, value, meta) {
-                            var input = document.createElement('input');
-                            input.setAttribute('type', 'file');
-                            input.setAttribute('accept', 'image/*');
-
-                            input.onchange = function () {
-                                var file = this.files[0];                    
-                                var reader = new FileReader();
-
-                                reader.onload = function () {
-                                    /*
-                                    Note: Now we need to register the blob in TinyMCEs image blob
-                                    registry. In the next release this part hopefully won't be
-                                    necessary, as we are looking to handle it internally.
-                                    */
-                                    var id = 'blobid' + (new Date()).getTime();
-                                    var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-                                    var base64 = reader.result.split(',')[1];
-
-                                    var blobInfo = blobCache.create(id, file, base64);                                    
-                                    blobCache.add(blobInfo);
-
-                                    /* call the callback and populate the Title field with the file name */
-                                    cb(blobInfo.blobUri(), { title: file.name });
-                                };
-
-                                reader.readAsDataURL(file);
-                            };
-
-                            input.click();
-                        }   
-                    });
-              </script>
-            </div>
-        </div>
-        <div class="row">
-            
-        </div>
-        <div class="row">
-            <div class="col-md-9">
-                <input type="submit" value="Save"/>
-            </div>
-        </div>    
-    </form>    
-</div>
-
+    </div>
 </body>
 </html>

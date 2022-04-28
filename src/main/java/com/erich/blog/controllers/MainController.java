@@ -36,7 +36,10 @@ public class MainController {
            posts = pr.findByTopic(topic);
        }
        List<Post> asides = pr.findByAsideTag();
-       List<String> topics = pr.findAll().stream().map(t -> t.getTopic()).limit(5).collect(Collectors.toList());
+       List<String> topics = pr.findAll().stream()
+               .map(t -> t.getTopic())
+               .limit(5)
+               .collect(Collectors.toList());
        model.addAttribute("topics", topics);
        model.addAttribute("asides", asides);
        model.addAttribute("posts", posts);

@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -32,8 +33,10 @@ public class Post {
     @Column
     private LocalDateTime date = LocalDateTime.now();
     @Column(name = "start_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startDate;
     @Column(name = "end_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime endDate;
     @Column(name = "approved")
     private boolean appr;
