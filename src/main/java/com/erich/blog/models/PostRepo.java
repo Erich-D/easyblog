@@ -17,12 +17,14 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
     @Query("select p from posts p join p.tags t "
             + "where t.id > 49 AND (p.startDate = NULL OR p.startDate <= Date(NOW()))"
             + "AND (p.endDate = NULL OR p.endDate >= Date(NOW()))"
+            + "AND p.appr = true "
             + "group by p.id")
     List<Post> findByRegulerTags();
     
     @Query("select p from posts p join p.tags t where t.name like 'aside'"
             + "AND (p.startDate = NULL OR p.startDate <= Date(NOW()))"
-            + "AND (p.endDate = NULL OR p.endDate >= Date(NOW()))")
+            + "AND (p.endDate = NULL OR p.endDate >= Date(NOW()))"
+            + "AND p.appr = true")
     List<Post> findByAsideTag();
     
     List<Post> findByTopic(String topic);

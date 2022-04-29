@@ -9,6 +9,7 @@ import com.erich.blog.models.Post;
 import com.erich.blog.models.PostRepo;
 import com.erich.blog.models.Tag;
 import com.erich.blog.models.TagRepo;
+import com.erich.blog.models.User;
 import com.erich.blog.models.UserRepo;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -73,6 +74,7 @@ public class AdminController {
             blogPost.getTags().add(tp.findByName(request.getParameter("aside")));
         }
         blogPost.setAuthor(up.getById(1));
+        blogPost.setAppr(true);
         rp.save(blogPost);
 	System.out.println("Start Date is " + blogPost.getStartDate());
         System.out.println("End date is " + blogPost.getEndDate());

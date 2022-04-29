@@ -7,6 +7,7 @@ package com.erich.blog.controllers;
 
 import com.erich.blog.models.Post;
 import com.erich.blog.models.PostRepo;
+import com.erich.blog.models.TagRepo;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +26,22 @@ public class MainController {
     
    @Autowired
    PostRepo pr;
+   
+   @Autowired
+   TagRepo tp;
     
    @GetMapping("/")
    public String testPage(Model model, String topic) {
        System.out.println(topic);
        List<Post> posts;
        if(topic == null){
-           posts = pr.findByRegulerTags();
+           posts = pr.findByRegulerTags().stream()
+                   .filter(p -> !p.getTags().contains(tp.findById(5).orElse(null)))
+                   .collect(Collectors.toList());
        }else{
-           posts = pr.findByTopic(topic);
+           posts = pr.findByTopic(topic).stream()
+                   .filter(p -> !p.getTags().contains(tp.findById(5).orElse(null)))
+                   .collect(Collectors.toList());
        }
        List<Post> asides = pr.findByAsideTag();
        List<String> topics = pr.findAll().stream()
